@@ -28,6 +28,8 @@ var update_library_view = function () {
 var app = document.querySelector('#app');
 app.innerHTML = update_library_view();
 
+const mm = window.musicmetadata;
+
 function dropHandler(ev) {
   console.log('File(s) dropped');
 
@@ -40,6 +42,12 @@ function dropHandler(ev) {
       // If dropped items aren't files, reject them
       if (ev.dataTransfer.items[i].kind === 'file') {
         var file = ev.dataTransfer.items[i].getAsFile();
+
+        var parser = mm(file, function (err, metadata) {
+          if (err) throw err;
+          console.log(metadata);
+        });
+
         let example_track = new Track(file.name, file.name);
         track_library.tracks.push(example_track);
         app.innerHTML = update_library_view();
