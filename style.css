@@ -1,7 +1,87 @@
-#drop_zone {
-    border: 5px solid blue;
-    width:  200px;
-    height: 100px;
+body
+{
+    font-family: Roboto, sans-serif;
+    color: #0f3c4b;
+    background-color: #e5edf1;
+    padding: 5rem 1.25rem; /* 80 20 */
+}
+
+.container
+{
+    width: 100%;
+    max-width: 680px; /* 800 */
+    /*text-align: center;*/
+    margin: 0 auto;
+}
+
+.box
+{
+    font-size: 1.25rem; /* 20 */
+    background-color: #c8dadf;
+    position: relative;
+    padding: 50px 30px 20px 30px;
+}
+
+.box.has-advanced-upload {
+    background-color: white;
+    outline: 2px dashed transparent;
+    outline-offset: -10px;
+    transition: outline-offset .15s ease-in-out, background-color .15s linear;
+}
+.box.has-advanced-upload .box__dragndrop {
+    display: inline;
+}
+
+.box.is-dragover {
+    background-color: grey;
+    outline-offset: -20px;
+    outline-color: #9ca7aa;
+    background-color: #fff;
+}
+
+.box__dragndrop
+{
+    display: none;
+}
+
+.box.has-advanced-upload .box__dragndrop
+{
+    display: inline;
+}
+
+.box__file
+{
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.box__file + label
+{
+    max-width: 80%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    display: inline-block;
+    overflow: hidden;
+}
+
+.box__file + label:hover strong,
+.box__file:focus + label strong
+{
+    color: #39bfd3;
+}
+
+.box__file:focus + label {
+    outline: 1px dotted #000;
+}
+
+.box__input {
+    text-align: center;
+    padding-bottom: 20px;
 }
 
 li {

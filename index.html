@@ -1,19 +1,46 @@
 
 <!DOCTYPE html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>DJ Track Library Manager</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="./style.css">
-    </head>
-    <body>
-        <div id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
-            <p>Drag Tracks into this Drop Zone ...</p>
-        </div>
-        <div id="app"></div>
-        <script src="./musicmetadata.js"></script>
-        <script src="app.js" async defer></script>
-    </body>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>DJ Track Library Manager</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <!-- <div class="TrackLibrary" id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+        <p>Drag Tracks into this Drop Zone ...</p>
+        <ul id="lib_list">Track Library
+            
+        </ul>
+    </div>
+-->
+
+
+
+
+    <div class="container">
+        <form class="box" method="post" action="" enctype="multipart/form-data">
+            <div class="box__input">
+                <input class="box__file" type="file" name="files[]" id="file" data-multiple-caption="{count} files selected" multiple />
+                <label for="file">
+                    <strong>Choose tracks to upload</strong>
+                    <span class="box__dragndrop"> or drag them here</span>.
+                </label>
+            </div>
+            <ul id="lib_list">Track Library</ul>
+        </form>
+    </div>
+    
+
+
+
+
+
+
+
+    <script src="./musicmetadata.js"></script>
+    <script src="app.js" async defer></script>
+</body>
 </html>

@@ -1,77 +1,133 @@
+// Track data type
 function Track(artist, title) {
   this.artist = artist;
   this.title = title;
   this.mixable_tracks = [];
 }
-  
-let example_track = new Track('Artist', 'Title');
-  
+
 // Track Library state
 var track_library = {
-  tracks: [example_track]
+  tracks: []
 };
 
 // Libary view component
+var track_library_list = document.querySelector('#lib_list');
+
 var update_library_view = function () {
-  var list = document.createElement('ul');
-    for (var i = 0; i < track_library.tracks.length; i++) {
-        var item = document.createElement('li');
-        item.setAttribute("id", "Tracklist");
-        item.appendChild(document.createTextNode(track_library.tracks[i].artist + " - " + track_library.tracks[i].title));
-        list.appendChild(item);
-    }
-  return list.outerHTML; 
+  //list = document.querySelector('#lib_list');
+  //list.setAttribute("id", "Tracklist");
+  while (track_library_list.childNodes[1]) {
+    track_library_list.removeChild(track_library_list.childNodes[1]);
+  }
+  for (var i = 0; i < track_library.tracks.length; i++) {
+      var item = document.createElement('li');
+      item.appendChild(document.createTextNode(track_library.tracks[i].artist + " - " + track_library.tracks[i].title));
+      track_library_list.appendChild(item);
+
+      //2020-11-11 DELETE CHILD ELEMENTS? 
+  }
+  //return track_library_list.outerHTML; 
     // return '<p>' + track_library.title + ', ' + track_library.artist + '!</p>';
 };
 
 // Initial Library render
-var app = document.querySelector('#app');
-app.innerHTML = update_library_view();
+update_library_view();
 
-const mm = window.musicmetadata;
-
-function dropHandler(ev) {
-  console.log('File(s) dropped');
-
-  // Prevent default behavior (Prevent file from being opened)
-  ev.preventDefault();
-
-  if (ev.dataTransfer.items) {
-    // Use DataTransferItemList interface to access the file(s)
-    for (var i = 0; i < ev.dataTransfer.items.length; i++) {
-      // If dropped items aren't files, reject them
-      if (ev.dataTransfer.items[i].kind === 'file') {
-        var file = ev.dataTransfer.items[i].getAsFile();
-
-        var parser = mm(file, function (err, metadata) {
-          if (err) throw err;
-          console.log(metadata);
-        });
-
-        let example_track = new Track(file.name, file.name);
-        track_library.tracks.push(example_track);
-        app.innerHTML = update_library_view();
-      }
-    }
-  } else {
-    // Use DataTransfer interface to access the file(s)
-    for (var i = 0; i < ev.dataTransfer.files.length; i++) {
-      track_library.tracks.push(file.name);
-      app.innerHTML = update_library_view();
-    }
-  }
-}
-
-function dragOverHandler(ev) {
-  console.log('File(s) in drop zone'); 
-
-  // Prevent default behavior (Prevent file from being opened)
-  ev.preventDefault();
-}
-
-document.getElementById("Tracklist").addEventListener("click",function(e) {
+// track selection intitial
+document.getElementById("lib_list").addEventListener("click",function(e) {
   // e.target is our targetted element.
   if(e.target && e.target.nodeName == "LI") {
     alert("worked");
+  }
+});
+
+var isAdvancedUpload = function() {
+  var div = document.createElement('div');
+  return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
+}();
+
+// applying the effect for every form
+// select all elements with class box
+var form = document.querySelector( '.box' );
+
+// submit form function, used below
+var triggerFormSubmit = function() {
+  var event = document.createEvent( 'HTMLEvents' );
+  event.initEvent( 'submit', true, false );
+  form.dispatchEvent( event );
+};
+
+// init dropped files
+var droppedFiles = false;
+
+// automatically submit the form on file select
+var input = form.querySelector( 'input[type="file"]' )
+input.addEventListener( 'change', function( e ) {
+  //showFiles( e.target.files );
+  triggerFormSubmit();
+});
+
+// check for drag and drop functionality
+if( isAdvancedUpload ) {
+  
+  // add class to .box form for css styling
+  form.classList.add( 'has-advanced-upload' );
+
+  // add a listener for drag events
+  [ 'drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop' ].forEach( function( event ) {
+    form.addEventListener( event, function( e ) {
+      // preventing the unwanted behaviours
+      e.preventDefault();
+      e.stopPropagation();
+    });
+  });
+ 
+  // add class upon dragover/dragenter states for css styling
+  [ 'dragover', 'dragenter' ].forEach( function( event ) {
+    form.addEventListener( event, function() {
+      form.classList.add( 'is-dragover' );
+    });
+  });
+  
+  // remove the above class upon dragleave/dragend/drop states for css styling
+  [ 'dragleave', 'dragend', 'drop' ].forEach( function( event ) {
+    form.addEventListener( event, function() {
+      form.classList.remove( 'is-dragover' );
+    });
+  });
+  
+  // capture dropped files upon drop
+
+  form.addEventListener( 'drop', function( e ) {
+    droppedFiles = e.dataTransfer.items; // the files that were dropped
+    //showFiles( droppedFiles );
+    triggerFormSubmit();
+  });
+}
+
+const mm = window.musicmetadata;
+
+// if the form was submitted
+form.addEventListener( 'submit', function( e )
+{
+  
+  if( isAdvancedUpload ) {
+    e.preventDefault();  
+    if( droppedFiles ) {
+      for (var i = 0; i < droppedFiles.length; i++) {
+        // If dropped items aren't files, reject them
+        if (droppedFiles[i].kind === 'file') {
+          var file = droppedFiles[i].getAsFile();
+  
+          var parser = mm(file, function (err, metadata) {
+            if (err) throw err;
+            //console.log(metadata);
+            let track = new Track(metadata.artist[0], metadata.title);
+            track_library.tracks.push(track);
+            update_library_view();
+          });
+        }
+      }
+    }
   }
 });
