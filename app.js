@@ -10,6 +10,17 @@ var track_library = {
   tracks: []
 };
 
+myStorage = window.localStorage;
+myStorage.setItem('local_storage_track_library', JSON.stringify(track_library));
+
+var set_local_storage_lib = function () {
+  myStorage.setItem('local_storage_track_library', JSON.stringify(track_library));
+}
+
+var get_local_storage_lib = function () {
+  track_library = JSON.parse = myStorage.getItem('local_storage_track_library');
+}
+
 // Libary view component
 var track_library_list = document.querySelector('#lib_list');
 
@@ -37,7 +48,7 @@ update_library_view();
 document.getElementById("lib_list").addEventListener("click",function(e) {
   // e.target is our targetted element.
   if(e.target && e.target.nodeName == "LI") {
-    alert("worked");
+    alert(myStorage.getItem('local_storage_track_library'));
   }
 });
 
@@ -124,6 +135,7 @@ form.addEventListener( 'submit', function( e )
             //console.log(metadata);
             let track = new Track(metadata.artist[0], metadata.title);
             track_library.tracks.push(track);
+            set_local_storage_lib();
             update_library_view();
           });
         }
