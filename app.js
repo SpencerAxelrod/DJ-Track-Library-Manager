@@ -7,19 +7,27 @@ function Track(artist, title) {
 
 // Track Library state
 var track_library = {
-  tracks: []
+  tracks: []//myStorage.getItem('local_storage_track_library')
 };
 
-myStorage = window.localStorage;
-myStorage.setItem('local_storage_track_library', JSON.stringify(track_library));
-
+//console.log(myStorage.getItem('local_storage_track_library'))
 var set_local_storage_lib = function () {
-  myStorage.setItem('local_storage_track_library', JSON.stringify(track_library));
+  localStorage.setItem('local_storage_track_library', JSON.stringify(track_library));
+  //alert("set storage");
 }
 
 var get_local_storage_lib = function () {
-  track_library = JSON.parse = myStorage.getItem('local_storage_track_library');
+  if (localStorage.getItem('local_storage_track_library')){
+    track_library.tracks = JSON.parse(localStorage.getItem('local_storage_track_library')).tracks;
+  } else {
+    track_library.tracks = []
+  }
+  //alert("get storage");
 }
+
+get_local_storage_lib();
+
+
 
 // Libary view component
 var track_library_list = document.querySelector('#lib_list');
@@ -27,6 +35,7 @@ var track_library_list = document.querySelector('#lib_list');
 var update_library_view = function () {
   //list = document.querySelector('#lib_list');
   //list.setAttribute("id", "Tracklist");
+  //alert("updatelib");
   while (track_library_list.childNodes[1]) {
     track_library_list.removeChild(track_library_list.childNodes[1]);
   }
@@ -34,21 +43,17 @@ var update_library_view = function () {
       var item = document.createElement('li');
       item.appendChild(document.createTextNode(track_library.tracks[i].artist + " - " + track_library.tracks[i].title));
       track_library_list.appendChild(item);
-
-      //2020-11-11 DELETE CHILD ELEMENTS? 
   }
-  //return track_library_list.outerHTML; 
-    // return '<p>' + track_library.title + ', ' + track_library.artist + '!</p>';
 };
 
 // Initial Library render
 update_library_view();
 
-// track selection intitial
-document.getElementById("lib_list").addEventListener("click",function(e) {
+// Track selection intitial on click functionality
+document.getElementById("lib_list").addEventListener("click", function(e) {
   // e.target is our targetted element.
   if(e.target && e.target.nodeName == "LI") {
-    alert(myStorage.getItem('local_storage_track_library'));
+    alert(localStorage.getItem('local_storage_track_library'));
   }
 });
 
@@ -116,8 +121,6 @@ if( isAdvancedUpload ) {
   });
 }
 
-const mm = window.musicmetadata;
-
 // if the form was submitted
 form.addEventListener( 'submit', function( e )
 {
@@ -125,21 +128,34 @@ form.addEventListener( 'submit', function( e )
   if( isAdvancedUpload ) {
     e.preventDefault();  
     if( droppedFiles ) {
+      
+      var jsmediatags = window.jsmediatags;
+
       for (var i = 0; i < droppedFiles.length; i++) {
         // If dropped items aren't files, reject them
         if (droppedFiles[i].kind === 'file') {
           var file = droppedFiles[i].getAsFile();
-  
-          var parser = mm(file, function (err, metadata) {
-            if (err) throw err;
-            //console.log(metadata);
-            let track = new Track(metadata.artist[0], metadata.title);
-            track_library.tracks.push(track);
-            set_local_storage_lib();
-            update_library_view();
+          jsmediatags.read(file, {
+            onSuccess: function(tag) {
+              console.log(tag.tags.artist);
+              let track = new Track(tag.tags.artist, tag.tags.title);
+              track_library.tracks.push(track);
+              set_local_storage_lib();
+              update_library_view();
+            },
+            onError: function(error) {
+              console.log(error);
+            }
           });
         }
       }
     }
   }
+});
+
+var clear = document.getElementById("clear");
+clear.addEventListener("click", function() {
+  localStorage.clear();
+  get_local_storage_lib();
+  update_library_view();
 });
