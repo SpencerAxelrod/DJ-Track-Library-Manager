@@ -55,7 +55,6 @@ var update_library_view = function () {
   while (track_library_list.childNodes[0]) {
     track_library_list.removeChild(track_library_list.childNodes[0]);
   }
-  //console.log(typeof track_library);
   if (Object.keys(track_library.tracks).length > 0) {
     track_library_list.classList.remove( 'lib_empty' );
 
@@ -67,7 +66,7 @@ var update_library_view = function () {
       
       var add_button = document.createElement('div');
       add_button.classList.add('myButton');
-      add_button.appendChild(document.createTextNode('+ Add'));
+      add_button.appendChild(document.createTextNode('Add'));
       item.appendChild(add_button);
       
       track_library_list.appendChild(item);
@@ -104,10 +103,12 @@ var update_current_track = function (Track) {
   }
   if (Track) {
     //var item = document.createTextNode(Track.artist + " - " + Track.title);
+    current_track_div.classList.remove('no_track_selected')
     var item = document.createTextNode(Track.artist + " - " + Track.title);
     current_track_div.appendChild(item)
   } else {
     current_track_div.appendChild(document.createTextNode("Select a Track from Library"))
+    current_track_div.classList.add('no_track_selected')
   }
 
 }
@@ -150,21 +151,33 @@ document.getElementById("lib_list").addEventListener("click", function(e) {
       track_stack.push(selected_track);
       current_track = selected_track;
     }
-    console.log(track_stack);
     set_local_storage_lib();
     update_current_track(current_track);
 
-    next_tracks = selected_track.mixable_tracks;
+    var next_tracks_ids = selected_track.mixable_tracks;
+    var next_tracks = []
+    for (var i = 0; i < next_tracks_ids.length; i++) {
+      next_tracks.push(track_library.tracks[next_tracks_ids[i]])
+    }
+
     update_next_tracks(next_tracks);
 
   } else if (e.target && e.target.className == "myButton") {
     //alert(e.target.parentElement.id);
-    var track_to_add = track_library.tracks[e.target.parentElement.id];
-    if (current_track != track_to_add) {
-      current_track.mixable_tracks.push(track_to_add);
+    if (current_track) {
+      var track_to_add = track_library.tracks[e.target.parentElement.id];
+      if ((current_track != track_to_add) && (!current_track.mixable_tracks.includes(track_to_add.id))) {
+        current_track.mixable_tracks.push(track_to_add.id);
+      }
+      //update_current_track(track_to_add);
+      var next_tracks_ids = current_track.mixable_tracks;
+      var next_tracks = []
+      for (var i = 0; i < next_tracks_ids.length; i++) {
+        next_tracks.push(track_library.tracks[next_tracks_ids[i]])
+      }
+      set_local_storage_lib();
+      update_next_tracks(next_tracks);
     }
-    //update_current_track(track_to_add);
-    update_next_tracks(current_track.mixable_tracks);
   }
 });
 
