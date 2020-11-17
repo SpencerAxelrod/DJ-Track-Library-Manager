@@ -160,7 +160,9 @@ document.getElementById("lib_list").addEventListener("click", function(e) {
   } else if (e.target && e.target.className == "myButton") {
     //alert(e.target.parentElement.id);
     var track_to_add = track_library.tracks[e.target.parentElement.id];
-    current_track.mixable_tracks.push(track_to_add);
+    if (current_track != track_to_add) {
+      current_track.mixable_tracks.push(track_to_add);
+    }
     //update_current_track(track_to_add);
     update_next_tracks(current_track.mixable_tracks);
   }
