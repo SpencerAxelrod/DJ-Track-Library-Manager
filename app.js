@@ -1,29 +1,44 @@
+// Track Library state
+var track_library = {
+  tracks: {},
+  count: 0
+  //2020-11-12 NEXT UP: LIBRARY CANT HAVE DUPLICATES
+};
+
+var track_stack = [];
+var current_track = null;
+
+// function to set a track's id
+function set_track_id() {
+  track_library.count = track_library.count + 1;
+  return track_library.count;
+}
+
 // Track data type
-function Track(artist, title) {
+function Track(artist, title, track_id) {
+  this.id = track_id;
   this.artist = artist;
   this.title = title;
   this.mixable_tracks = [];
 }
 
-// Track Library state
-var track_library = {
-  tracks: []//myStorage.getItem('local_storage_track_library')
-
-  //2020-11-12 NEXT UP: LIBRARY CANT HAVE DUPLICATES
-
-};
-
-//console.log(myStorage.getItem('local_storage_track_library'))
+// function to stor track library in local storage
 var set_local_storage_lib = function () {
-  localStorage.setItem('local_storage_track_library', JSON.stringify(track_library));
+  var lib_and_stack = {'local_storage_track_library': track_library, 'local_storage_stack': track_stack}
+  localStorage.setItem('lib_and_stack', JSON.stringify(lib_and_stack));
   //alert("set storage");
 }
 
+
+// function to retrieve track library to local storage
 var get_local_storage_lib = function () {
-  if (localStorage.getItem('local_storage_track_library')){
-    track_library.tracks = JSON.parse(localStorage.getItem('local_storage_track_library')).tracks;
+  if (localStorage.getItem('lib_and_stack')){
+    var lib_and_stack = JSON.parse(localStorage.getItem('lib_and_stack'));
+    track_library = lib_and_stack['local_storage_track_library'];
+    track_stack = lib_and_stack['local_storage_stack']
   } else {
-    track_library.tracks = []
+    track_library.tracks = {}
+    track_library.count = 0;
   }
   //alert("get storage");
 }
@@ -40,13 +55,33 @@ var update_library_view = function () {
   while (track_library_list.childNodes[0]) {
     track_library_list.removeChild(track_library_list.childNodes[0]);
   }
-  if (track_library.tracks.length > 0) {
+  //console.log(typeof track_library);
+  if (Object.keys(track_library.tracks).length > 0) {
     track_library_list.classList.remove( 'lib_empty' );
+
+    for (var id in track_library.tracks) {
+      var item = document.createElement('li');
+      item.appendChild(document.createTextNode(track_library.tracks[id].artist + " - " + track_library.tracks[id].title));
+      // add track id to html id
+      item.id = id;
+      
+      var add_button = document.createElement('div');
+      add_button.classList.add('myButton');
+      add_button.appendChild(document.createTextNode('+ Add'));
+      item.appendChild(add_button);
+      
+      track_library_list.appendChild(item);
+    }
+
+    /*
     for (var i = 0; i < track_library.tracks.length; i++) {
       var item = document.createElement('li');
       item.appendChild(document.createTextNode(track_library.tracks[i].artist + " - " + track_library.tracks[i].title));
+      // add track id to html id
+      item.id = track_library.tracks[i].id;
       track_library_list.appendChild(item);
-    }
+      
+    } */
   } else {
     track_library_list.classList.add( 'lib_empty' );
     var item = document.createTextNode("Library Empty");
@@ -55,9 +90,13 @@ var update_library_view = function () {
   
 };
 
+var example_track = new Track("Example", "Track", "Example-Track");
+//track_library.tracks[example_track.id] = example_track;
+
 // Initial Library render
 update_library_view();
 
+// function that takes a track or null, updates current track div with track artist-title
 var update_current_track = function (Track) {
   var current_track_div = document.querySelector('.current_track');
   while (current_track_div.hasChildNodes()){
@@ -65,20 +104,65 @@ var update_current_track = function (Track) {
   }
   if (Track) {
     //var item = document.createTextNode(Track.artist + " - " + Track.title);
-    var item = document.createTextNode(Track);
+    var item = document.createTextNode(Track.artist + " - " + Track.title);
     current_track_div.appendChild(item)
   } else {
     current_track_div.appendChild(document.createTextNode("Select a Track from Library"))
   }
-  
+
 }
 
-// Track selection intitial on click functionality
+var update_next_tracks = function (next_tracks) {
+  var next_track_div = document.querySelector('.next_tracks');
+  while (next_track_div.hasChildNodes()) {
+    next_track_div.removeChild(next_track_div.childNodes[0]);
+  }
+  if (next_tracks.length > 0) {
+    next_track_div.classList.remove('next_tracks_empty')
+    for (var i = 0; i < next_tracks.length; i++) {
+      var item = document.createElement('li');
+      item.id = next_tracks[i].id;
+      item.appendChild(document.createTextNode(next_tracks[i].artist + " - " + next_tracks[i].title));
+      /*
+      var add_button = document.createElement('div');
+      add_button.classList.add('myButton');
+      add_button.appendChild(document.createTextNode('+ Add'));
+      item.appendChild(add_button);
+      */
+      next_track_div.appendChild(item);
+    }
+  } else {
+    next_track_div.classList.add('next_tracks_empty')
+  }
+}
+
+// Track selection/track library click functionality
 document.getElementById("lib_list").addEventListener("click", function(e) {
   // e.target is our targetted element.
   if(e.target && e.target.nodeName == "LI") {
-    //alert(localStorage.getItem('local_storage_track_library'));
-    update_current_track(e.target.textContent);
+    selected_track_id = e.target.id;
+    selected_track = track_library.tracks[selected_track_id]
+    
+    if (current_track != selected_track) {
+      if (track_stack.length > 99) {
+        track_stack.shift();
+      }
+      track_stack.push(selected_track);
+      current_track = selected_track;
+    }
+    console.log(track_stack);
+    set_local_storage_lib();
+    update_current_track(current_track);
+
+    next_tracks = selected_track.mixable_tracks;
+    update_next_tracks(next_tracks);
+
+  } else if (e.target && e.target.className == "myButton") {
+    //alert(e.target.parentElement.id);
+    var track_to_add = track_library.tracks[e.target.parentElement.id];
+    current_track.mixable_tracks.push(track_to_add);
+    //update_current_track(track_to_add);
+    update_next_tracks(current_track.mixable_tracks);
   }
 });
 
@@ -159,7 +243,8 @@ var awaitableHelper = function(mp3_file) {
       onSuccess: (tag) => {
         
         // Create new Track from tags
-        let track = new Track(tag.tags.artist, tag.tags.title);
+        let track = new Track(tag.tags.artist, tag.tags.title, tag.tags.artist + " - " + tag.tags.title);
+        //track.mixable_tracks.push(example_track);
         resolve(track);
       },
       onError: (error) => {
@@ -187,10 +272,13 @@ input.addEventListener( 'submit', function( e )
           // Promise consumption, based on result of jsmediatag read attempt
           awaitableHelper(file)
           .then((track) => {
-            track_library.tracks.push(track);
-            set_local_storage_lib();
-            update_library_view();
-
+            if (track_library.tracks[track.id]) {
+              alert(track_library.tracks[track.id].id + " is already in library");
+            } else {
+              track_library.tracks[track.id] = track;
+              set_local_storage_lib();
+              update_library_view();
+            }
             //2020-11-12 NEXT: WAIT UNTIL ALL TRACKS READ, THEN CLEAR DATATRANSFER
 
           })
@@ -209,7 +297,7 @@ input.addEventListener( 'submit', function( e )
          // Promise consumption, based on result of jsmediatag read attempt
          awaitableHelper(file)
          .then((track) => {
-           track_library.tracks.push(track);
+           track_library.tracks[track.id] = track;
            set_local_storage_lib();
            update_library_view();
 
@@ -229,10 +317,8 @@ input.addEventListener( 'submit', function( e )
 var clear = document.getElementById("clear");
 clear.addEventListener("click", function() {
   localStorage.clear();
-
   get_local_storage_lib();
-
   update_library_view();
   update_current_track(null);
-
+  update_next_tracks([]);
 });
