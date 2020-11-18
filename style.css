@@ -9,6 +9,7 @@ body
 .container
 {
     width: 100%;
+    min-width: 680px;
     max-width: 680px; /* 800 */
     /*text-align: center;*/
     margin: 0 auto;
@@ -30,34 +31,60 @@ body
     color: lightgrey;
 }
 
+.next_tracks_container {
+    display: flex;
+}
+
 .next_tracks {
-    outline: 1px solid lightgrey;
+    flex-basis: 0;
+    flex-grow: 1;
+    border: 1px solid lightgrey;
     padding: 0px 0px 0px 0px;
+    height: 172px;
+    overflow: hidden;
+    overflow-y: scroll;
 }
 
 .next_tracks.next_tracks_empty {
-    outline: 1px solid transparent;
+    color: lightgrey;
 }
 
 .next_tracks li {
+    width: 100%;
+    font-size: 1rem;
     cursor: pointer;
-    padding: 10px 10px 10px 10px;
+    box-sizing: border-box;
+    padding: 6px 6px 6px 6px;
+    margin: 0px 0px 0px 0px;
     list-style-type: none;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border: 1px solid white;
 }
 
 .next_tracks li:nth-child(2n){
     background: #f7f7f7;
+    border: 1px solid #f7f7f7;
 }
 
 .next_tracks li:hover {
     background: #f4f4f4;
+    border: 1px solid black;
 }
 
 .next_tracks li:nth-child(2n):hover{
     background: #ececec;
+
+}
+
+.next_track_info {
+    flex-basis: 0;
+    flex-grow: 1;
+    border: 1px solid lightgrey;
+    margin-left: -1px;
+    padding: 0px 0px 0px 0px;
+    height: 172px;
 }
 
 .myButton {
