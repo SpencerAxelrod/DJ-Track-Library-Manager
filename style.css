@@ -192,18 +192,25 @@ body
 }
 
 .box ul {
+    max-height: 400px;
     outline: 1px solid lightgrey;
+    overflow: hidden;
+    overflow-y: scroll;
     padding: 0px 0px 0px 0px;
 }
 
 .box ul.lib_empty  {
     outline: 1px solid transparent;
+    overflow-y: auto;
     color: lightgrey;
 }
 
 .box li {
+    width: 100%;
+    font-size: 1rem;
     cursor: pointer;
     padding: 10px 10px 10px 10px;
+    box-sizing: border-box;
     list-style-type: none;
     display: flex;
     justify-content: space-between;
