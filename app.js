@@ -19,7 +19,7 @@ function Track(artist, title, track_id) {
   this.id = track_id;
   this.artist = artist;
   this.title = title;
-  this.mixable_tracks = [];
+  this.mixable_tracks = {};
 }
 
 // function to stor track library in local storage
@@ -141,8 +141,8 @@ var update_next_tracks = function (next_tracks) {
 document.getElementById("lib_list").addEventListener("click", function(e) {
   // e.target is our targetted element.
   if(e.target && e.target.nodeName == "LI") {
-    selected_track_id = e.target.id;
-    selected_track = track_library.tracks[selected_track_id]
+    var selected_track_id = e.target.id;
+    var selected_track = track_library.tracks[selected_track_id]
     
     if (current_track != selected_track) {
       if (track_stack.length > 99) {
@@ -156,8 +156,8 @@ document.getElementById("lib_list").addEventListener("click", function(e) {
 
     var next_tracks_ids = selected_track.mixable_tracks;
     var next_tracks = []
-    for (var i = 0; i < next_tracks_ids.length; i++) {
-      next_tracks.push(track_library.tracks[next_tracks_ids[i]])
+    for (var i = 0; i < Object.keys(next_tracks_ids).length; i++) {
+      next_tracks.push(track_library.tracks[Object.keys(next_tracks_ids)[i]])
     }
 
     update_next_tracks(next_tracks);
@@ -166,19 +166,87 @@ document.getElementById("lib_list").addEventListener("click", function(e) {
     //alert(e.target.parentElement.id);
     if (current_track) {
       var track_to_add = track_library.tracks[e.target.parentElement.id];
-      if ((current_track != track_to_add) && (!current_track.mixable_tracks.includes(track_to_add.id))) {
-        current_track.mixable_tracks.push(track_to_add.id);
+      if ((current_track != track_to_add) && (!current_track.mixable_tracks.hasOwnProperty(track_to_add.id))) { //} current_track.mixable_tracks.includes(track_to_add.id))) {
+        current_track.mixable_tracks[track_to_add.id] = {}; //current_track.mixable_tracks.push(track_to_add.id);
       }
       //update_current_track(track_to_add);
       var next_tracks_ids = current_track.mixable_tracks;
       var next_tracks = []
-      for (var i = 0; i < next_tracks_ids.length; i++) {
-        next_tracks.push(track_library.tracks[next_tracks_ids[i]])
+      for (var i = 0; i < Object.keys(next_tracks_ids).length; i++) {
+        next_tracks.push(track_library.tracks[Object.keys(next_tracks_ids)[i]])
       }
       set_local_storage_lib();
       update_next_tracks(next_tracks);
     }
   }
+});
+
+var update_next_track_info_view = function (track_id) {
+  var next_track_info_div = document.querySelector(".next_track_info"); 
+  if (track_id) { 
+    if (track_id != next_track_info_div.id) {
+
+    while (next_track_info_div.hasChildNodes()) {
+      next_track_info_div.removeChild(next_track_info_div.childNodes[0]);
+    }
+
+    next_track_info_div.id = track_id;
+    var next_track = track_library.tracks[track_id];
+    var next_track_artist_title = next_track.artist + " - " + next_track.title;
+    var next_track_info = current_track.mixable_tracks[track_id];
+    var item = document.createElement('div');
+    item.classList.add("next_track_artist_title");
+    item.appendChild(document.createTextNode(next_track_artist_title));
+    next_track_info_div.appendChild(item);
+    }
+  } else {
+    while (next_track_info_div.hasChildNodes()) {
+      next_track_info_div.removeChild(next_track_info_div.childNodes[0]);
+    }
+    next_track_info_div.id = "";
+  }
+}
+
+var clickedNextTrack =  function (track_id) {
+  //var next_track_id = x;
+  update_next_track_info_view(track_id);
+}
+
+document.querySelector(".next_tracks").addEventListener("click", function(e) {
+  //e.target is our targetted element.
+  if(e.target && e.target.nodeName == "LI") {
+    clickedNextTrack(e.target.id);
+  }
+});
+
+var clickedNextTrackToCurrent = function (track_id) {
+  var selected_track = track_library.tracks[track_id]
+  if (track_stack.length > 99) {
+    track_stack.shift();
+  }
+  track_stack.push(selected_track);
+  current_track = selected_track;
+  set_local_storage_lib();
+  update_current_track(track_library.tracks[track_id]);
+
+  var next_tracks_ids = selected_track.mixable_tracks;
+  var next_tracks = []
+  for (var i = 0; i < Object.keys(next_tracks_ids).length; i++) {
+    next_tracks.push(track_library.tracks[Object.keys(next_tracks_ids)[i]])
+  }
+
+  update_next_tracks(next_tracks);
+
+  update_next_track_info_view(null);
+  
+}
+
+document.querySelector(".next_track_info").addEventListener("click", function(e) {
+  //e.target is our targetted element.
+  if(e.target && e.target.classList.contains("next_track_artist_title")) {
+    clickedNextTrackToCurrent(e.target.parentElement.id);
+  }
+  
 });
 
 // Function to check for drag and drop functionality
