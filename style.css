@@ -25,10 +25,41 @@ body
 .current_track {
     padding: 0px 0px 0px 0px;
     margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .current_track.no_track_selected {
     color: lightgrey;
+}
+
+.previous_in_stack {
+    cursor: pointer;
+    margin-right: 20px;
+    width: 0;
+    height: 0;
+    border-top: 7px solid transparent;
+    border-right: 14px solid #70c3ff;
+    border-bottom: 7px solid transparent;
+}
+
+.next_in_stack {
+    cursor: pointer;
+    margin-left: 20px;
+    width: 0;
+    height: 0;
+    border-top: 7px solid transparent;
+    border-left: 14px solid #70c3ff;
+    border-bottom: 7px solid transparent;
+}
+
+.current_track.no_track_selected .previous_in_stack {
+    border-right: 10px solid lightgrey;
+}
+
+.current_track.no_track_selected .next_in_stack {
+    border-left: 10px solid lightgrey;
 }
 
 .next_tracks_container {
@@ -96,26 +127,6 @@ body
 
 .next_track_artist_title:hover {
     color: #39bfd3;
-}
-
-.myButton {
-	background-color: #44c767;
-	border-radius: 28px;
-	display: inline-block;
-	cursor: pointer;
-	color: #ffffff;
-	font-family: Arial;
-	font-size: 14px;
-	padding: 4px 12px;
-	text-decoration: none;
-	
-}
-.myButton:hover {
-	background-color:#5cbf2a;
-}
-.myButton:active {
-	position:relative;
-	top:1px;
 }
 
 .box__input {
@@ -220,7 +231,7 @@ body
     width: 100%;
     font-size: 1rem;
     cursor: pointer;
-    padding: 10px 10px 10px 10px;
+    padding: 0px 0px 0px 10px;
     box-sizing: border-box;
     list-style-type: none;
     display: flex;
@@ -238,4 +249,31 @@ body
 
 .box li:nth-child(2n):hover{
     background: #ececec;
+}
+
+.myButton {
+    background-color:#87cdff;
+	border-radius: 0px;
+	display: inline-block;
+	cursor: pointer;
+	color: #ffffff;
+	font-family: Arial;
+	font-size: 14px;
+	padding: 10px 20px 10px 20px;
+    text-decoration: none;
+}
+.myButton:hover {
+	background-color: #44c767;
+}
+.myButton:active {
+	position:relative;
+	top:0px;
+}
+
+.box li:nth-child(2n) .myButton{
+    background-color:#70c3ff;
+}
+
+.box li:nth-child(2n) .myButton:hover{
+    background-color: #44c767;
 }
