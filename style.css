@@ -85,27 +85,46 @@ body
     font-size: 1rem;
     cursor: pointer;
     box-sizing: border-box;
-    padding: 6px 6px 6px 6px;
+    //padding: 6px 6px 6px 6px;
     margin: 0px 0px 0px 0px;
     list-style-type: none;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid white;
+    white-space: nowrap;
+    //border: 1px solid white;
+}
+
+.next_track_li_div {
+    display: inline-block;
+    //box-shadow: inset 0 0 5px #0f0;
+    height: 100%;
+    padding: 10px 6px 6px 6px;
+    min-width: 100%;
+    box-sizing: border-box;
+}
+
+.next_track_li_div_overflow:hover {
+    //padding: 6px 6px 6px 6px;
+    animation: marquee 4s linear infinite;
+}
+
+@keyframes marquee {
+    0%   { transform: translate(0, 0); }
+    91% { transform: translate(-49%, 0); }
+    100% { transform: translate(-49%, 0); }
 }
 
 .next_tracks li:nth-child(2n){
     background: #f7f7f7;
-    border: 1px solid #f7f7f7;
+    //border: 1px solid #f7f7f7;
 }
 
 .next_tracks li:hover {
-    background: #f4f4f4;
-    border: 1px solid black;
+    //background: #f4f4f4;
+    //border: 1px solid black;
+    box-shadow: inset 0 0 8px #a92;
 }
 
 .next_tracks li:nth-child(2n):hover{
-    background: #ececec;
+    //background: #ececec;
 
 }
 
@@ -251,7 +270,7 @@ body
     background: #ececec;
 }
 
-.myButton {
+.add_mixible_button {
     background-color:#87cdff;
 	border-radius: 0px;
 	display: inline-block;
@@ -262,18 +281,39 @@ body
 	padding: 10px 20px 10px 20px;
     text-decoration: none;
 }
-.myButton:hover {
+.add_mixible_button:hover {
 	background-color: #44c767;
 }
-.myButton:active {
+.add_mixible_button:active {
 	position:relative;
 	top:0px;
 }
 
-.box li:nth-child(2n) .myButton{
+.box li:nth-child(2n) .add_mixible_button{
     background-color:#70c3ff;
 }
 
-.box li:nth-child(2n) .myButton:hover{
+.box li:nth-child(2n) .add_mixible_button:hover{
     background-color: #44c767;
+}
+
+.library_footer {
+    font-size: 1rem;
+    background-color: white;
+    background: #f7f7f7;
+    padding: 20px 30px 20px 30px;
+}
+
+.load_demo_library {
+    color: slategray;
+}
+
+.load_demo_library>a {
+    color: slategray;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.load_demo_library>a:hover {
+    color: #39bfd3;
 }

@@ -9,7 +9,7 @@ var track_stack = [];
 var track_pointer = -1;
 var current_track = null;
 
-// function to set a track's id
+// function to set a track's id -> CURRENTLY NOT USING?
 function set_track_id() {
   track_library.count = track_library.count + 1;
   return track_library.count;
@@ -23,14 +23,13 @@ function Track(artist, title, track_id) {
   this.mixable_tracks = {};
 }
 
-// function to stor track library in local storage
+// function to store track library in local storage
 var set_local_storage_lib = function () {
   var lib_and_stack = {'local_storage_track_library': track_library, 
                        'local_storage_stack': track_stack, 
                        'local_storage_track_pointer': track_pointer}
   localStorage.setItem('lib_and_stack', JSON.stringify(lib_and_stack));
 }
-
 
 // function to retrieve track library to local storage
 var get_local_storage_lib = function () {
@@ -65,7 +64,7 @@ var update_library_view = function () {
       // add track id to html id
       item.id = id;
       var add_button = document.createElement('div');
-      add_button.classList.add('myButton');
+      add_button.classList.add('add_mixible_button');
       add_button.appendChild(document.createTextNode('Add'));
       item.appendChild(add_button);
       track_library_list.appendChild(item);
@@ -124,15 +123,35 @@ var update_next_tracks = function (next_tracks) {
     for (var i = 0; i < next_tracks.length; i++) {
       var item = document.createElement('li');
       item.id = next_tracks[i].id;
-      item.appendChild(document.createTextNode(next_tracks[i].artist + " - " + next_tracks[i].title));
+      var next_track_li_div = document.createElement('div');
+      next_track_li_div.classList.add('next_track_li_div')
+      next_track_li_div.appendChild(document.createTextNode(next_tracks[i].artist + " - " + next_tracks[i].title));
+      item.appendChild(next_track_li_div);
+
+      function isElementOverflowing(element) {
+        var overflowX = element.offsetWidth < element.scrollWidth,
+            overflowY = element.offsetHeight < element.scrollHeight;
+    
+        return (overflowX || overflowY);
+      }
+
       next_track_div.appendChild(item);
+      //alert(isElementOverflowing(item));
+      if (isElementOverflowing(item)) {
+        next_track_li_div.classList.add('next_track_li_div_overflow');
+        next_track_li_div.appendChild(document.createTextNode("\u00A0 \u00A0 \u00A0 \u00A0 \u00A0 \u00A0 \u00A0 \u00A0" 
+                                                              + next_tracks[i].artist 
+                                                              + " - " 
+                                                              + next_tracks[i].title
+                                                              + "\u00A0 \u00A0 \u00A0 \u00A0 \u00A0 \u00A0 \u00A0 \u00A0"));
+      }
     }
   } else {
     next_track_div.classList.add('next_tracks_empty')
   }
 };
 
-// function to process id after a library tracked is clicked
+// function to process id after a library track is clicked
 var clickedLibraryTrack = function(track_id) {
   var selected_track = track_library.tracks[track_id]
   if (current_track != selected_track) {
@@ -154,9 +173,10 @@ var clickedLibraryTrack = function(track_id) {
     next_tracks.push(track_library.tracks[Object.keys(next_tracks_ids)[i]])
   }
   update_next_tracks(next_tracks);
+  update_next_track_info_view(null);
 };
 
-// function to process id after add button is clocked
+// function to process id after add button is clicked
 var clickedAddMixable = function(track_id) {
   if (current_track) {
     var track_to_add = track_library.tracks[track_id];
@@ -179,7 +199,7 @@ document.getElementById("lib_list").addEventListener("click", function(e) {
   // e.target is our targetted element.
   if(e.target && e.target.nodeName == "LI") {
     clickedLibraryTrack(e.target.id);
-  } else if (e.target && e.target.className == "myButton") {
+  } else if (e.target && e.target.className == "add_mixible_button") {
     clickedAddMixable(e.target.parentElement.id);
   }
 });
@@ -229,8 +249,8 @@ var clickedNextTrack =  function (track_id) {
 // Next/mixable tracks click listener functionality
 document.querySelector(".next_tracks").addEventListener("click", function(e) {
   //e.target is our targetted element.
-  if(e.target && e.target.nodeName == "LI") {
-    clickedNextTrack(e.target.id);
+  if(e.target && e.target.classList.contains("next_track_li_div")) {
+    clickedNextTrack(e.target.parentNode.id);
   }
 });
 
@@ -286,10 +306,32 @@ var clickedPreviousButton = function() {
   }
 }
 
+var clickedNextButton = function() {
+  if (track_pointer + 1 < track_stack.length) {
+    track_pointer++;
+    var track_id = track_stack[track_pointer]
+    var selected_track = track_library.tracks[track_id]
+    current_track = selected_track;
+    set_local_storage_lib();
+    update_current_track(selected_track);
+    var next_tracks_ids = selected_track.mixable_tracks;
+    var next_tracks = [];
+    for (var i = 0; i < Object.keys(next_tracks_ids).length; i++) {
+      next_tracks.push(track_library.tracks[Object.keys(next_tracks_ids)[i]])
+    }
+    update_next_tracks(next_tracks);
+    update_next_track_info_view(null);
+  }
+}
+
 document.querySelector('.current_track').addEventListener("click", function(e) {
   if(e.target && e.target.classList.contains("previous_in_stack")) {
-    alert("click");
+    console.log(track_pointer);
     clickedPreviousButton();
+  }
+  if(e.target && e.target.classList.contains("next_in_stack")) {
+    console.log(track_pointer);
+    clickedNextButton();
   }
 });
 
@@ -448,4 +490,40 @@ clear.addEventListener("click", function() {
   update_library_view();
   update_current_track(null);
   update_next_tracks([]);
+});
+
+// Load demo library button functionality
+var demo_lib = {"tracks":
+                   {"Colyn - Gravity":{"id":"Colyn - Gravity","artist":"Colyn","title":"Gravity","mixable_tracks":{}},
+                    "Dezza - The Koko Effect (Extended Mix)":{"id":"Dezza - The Koko Effect (Extended Mix)","artist":"Dezza","title":"The Koko Effect (Extended Mix)","mixable_tracks":{}},
+                    "Eli & Fur - Night Blooming Jasmine":{"id":"Eli & Fur - Night Blooming Jasmine","artist":"Eli & Fur","title":"Night Blooming Jasmine","mixable_tracks":{}},
+                    "Jerro - Demons feat. Sophia Bel (Massane Remix)":{"id":"Jerro - Demons feat. Sophia Bel (Massane Remix)","artist":"Jerro","title":"Demons feat. Sophia Bel (Massane Remix)","mixable_tracks":{}},
+                    "Kidnap - Ursa Minor (ATTLAS Remix)":{"id":"Kidnap - Ursa Minor (ATTLAS Remix)","artist":"Kidnap","title":"Ursa Minor (ATTLAS Remix)","mixable_tracks":{}},
+                    "Le Youth - Waves (Extended Mix)":{"id":"Le Youth - Waves (Extended Mix)","artist":"Le Youth","title":"Waves (Extended Mix)","mixable_tracks":{}},
+                    "Luttrell - After All":{"id":"Luttrell - After All","artist":"Luttrell","title":"After All","mixable_tracks":{}},
+                    "ODESZA - La Ciudad":{"id":"ODESZA - La Ciudad","artist":"ODESZA","title":"La Ciudad","mixable_tracks":{}},
+                    "Rinzen - Exoplanet (Original Mix)":{"id":"Rinzen - Exoplanet (Original Mix)","artist":"Rinzen","title":"Exoplanet (Original Mix)","mixable_tracks":{}},
+                    "SG Lewis - Time":{"id":"SG Lewis - Time","artist":"SG Lewis","title":"Time","mixable_tracks":{}},
+                    "Tim Engelhardt - Prophecy":{"id":"Tim Engelhardt - Prophecy","artist":"Tim Engelhardt","title":"Prophecy","mixable_tracks":{}},
+                    "Yotto - Chemicals (Original Mix)":{"id":"Yotto - Chemicals (Original Mix)","artist":"Yotto","title":"Chemicals (Original Mix)","mixable_tracks":{}},
+                    "ZHU - Desert Woman":{"id":"ZHU - Desert Woman","artist":"ZHU","title":"Desert Woman","mixable_tracks":{}}
+                   },
+                "count":0
+               };
+
+var load_demo_library = function () {
+  localStorage.clear();
+  track_stack = []
+  track_pointer = -1;
+  track_library = demo_lib;
+  set_local_storage_lib();
+  get_local_storage_lib();
+  update_library_view();
+  update_current_track(null);
+  update_next_tracks([]);
+}
+
+var demo_button = document.querySelector('.demo_button');
+demo_button.addEventListener("click", function() {
+  load_demo_library();
 });
