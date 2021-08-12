@@ -16,10 +16,12 @@ function set_track_id() {
 }
 
 // Track data type
-function Track(artist, title, track_id) {
-  this.id = track_id;
+function Track(artist, title, track_id, bpm, key) {
   this.artist = artist;
   this.title = title;
+  this.id = track_id;
+  this.bpm = bpm;
+  this.key = key;
   this.mixable_tracks = {};
 }
 
@@ -83,31 +85,65 @@ update_library_view();
 // function that takes a track or null, updates current track div with track artist-title
 var update_current_track = function (Track) {
   var current_track_div = document.querySelector('.current_track');
-  //current_track_div.insertBefore( ,document.querySelector('.next_in_stack'))
+  var current_artist_div = document.querySelector('.current_artist');
+  var current_bpm_div = document.querySelector('.current_bpm');
+  var current_key_div = document.querySelector('.current_key');
+  var current_prev_next_container_div = document.querySelector('.current_prev_next_container');
+  
   while (current_track_div.hasChildNodes()){
     current_track_div.removeChild(current_track_div.childNodes[0])
   }
+
+  while (current_artist_div.hasChildNodes()){
+    current_artist_div.removeChild(current_artist_div.childNodes[0])
+  }
+
+  while (current_bpm_div.hasChildNodes()){
+    current_bpm_div.removeChild(current_bpm_div.childNodes[0])
+  }
+
+  while (current_key_div.hasChildNodes()){
+    current_key_div.removeChild(current_key_div.childNodes[0])
+  }
+
+  while (current_prev_next_container_div.hasChildNodes()){
+    current_prev_next_container_div.removeChild(current_prev_next_container_div.childNodes[0])
+  }
+
   if (Track) {
-    //var item = document.createTextNode(Track.artist + " - " + Track.title);
     current_track_div.classList.remove('no_track_selected')
-    var item = document.createTextNode(Track.artist + " - " + Track.title);
-    var left = document.createElement('div');
-    left.classList.add('previous_in_stack');
-    var right = document.createElement('div');
-    right.classList.add('next_in_stack');
-    current_track_div.appendChild(left);
+    var item = document.createTextNode(Track.title);
     current_track_div.appendChild(item)
-    current_track_div.appendChild(right);
-  } else {
+
+    var artist_text = document.createTextNode(Track.artist);
+    current_artist_div.appendChild(artist_text);
+
+    var bpm_text = document.createTextNode("BPM: " + Track.bpm);
+    current_bpm_div.appendChild(bpm_text);
+
+    var key_text = document.createTextNode("Key: " + Track.key);
+    current_key_div.appendChild(key_text);
+
     var left = document.createElement('div');
     left.classList.add('previous_in_stack');
+    if (track_pointer == 0) {
+      left.classList.add('no_previous');
+    }
+
     var right = document.createElement('div');
     right.classList.add('next_in_stack');
-    current_track_div.appendChild(left);
+    if (track_pointer == track_stack.length - 1) {
+      right.classList.add('no_next');
+    }
+
+    current_prev_next_container_div.appendChild(left);
+    current_prev_next_container_div.appendChild(right);
+
+  } else {
     current_track_div.appendChild(document.createTextNode("Select a Track from Library"))
-    current_track_div.appendChild(right);
     current_track_div.classList.add('no_track_selected')
     current_track = null;
+
   }
 
 };
@@ -150,6 +186,16 @@ var update_next_tracks = function (next_tracks) {
     next_track_div.classList.add('next_tracks_empty')
   }
 };
+
+// Initial Current Track render from local storage
+if (track_pointer >= 0) {
+  console.log(track_stack);
+  console.log(track_pointer);
+  console.log(track_stack[track_pointer]);
+  current_track = track_library.tracks[track_stack[track_pointer]];
+  update_current_track(current_track);
+  update_next_tracks(current_track);
+}
 
 // function to process id after a library track is clicked
 var clickedLibraryTrack = function(track_id) {
@@ -262,7 +308,7 @@ var clickedNextTrackToCurrent = function (track_id) {
     track_pointer--;
   }
   track_pointer++;
-  track_stack.push(track_id);
+  track_stack.splice(track_pointer, 0, track_id);
   current_track = selected_track;
   set_local_storage_lib();
   update_current_track(track_library.tracks[track_id]);
@@ -324,7 +370,7 @@ var clickedNextButton = function() {
   }
 }
 
-document.querySelector('.current_track').addEventListener("click", function(e) {
+document.querySelector('.current_prev_next_container').addEventListener("click", function(e) {
   if(e.target && e.target.classList.contains("previous_in_stack")) {
     console.log(track_pointer);
     clickedPreviousButton();
@@ -411,9 +457,25 @@ var awaitableHelper = function(mp3_file) {
     jsmediatags.read(mp3_file, {
       onSuccess: (tag) => {
         
+        var bpm = null;
+        var key = null;
+
+        try {
+          console.log(tag.tags.TBPM.data);
+          bpm = tag.tags.TBPM.data;
+        } catch (error) {
+          console.error('tag read error: ' + bpm);
+        }
+
+        try {
+          console.log(tag.tags.TKEY.data);
+          key = tag.tags.TKEY.data;
+        } catch (error) {
+          console.error('tag read error: ' + key);
+        }
+
         // Create new Track from tags
-        let track = new Track(tag.tags.artist, tag.tags.title, tag.tags.artist + " - " + tag.tags.title);
-        //track.mixable_tracks.push(example_track);
+        let track = new Track(tag.tags.artist, tag.tags.title, tag.tags.artist + " - " + tag.tags.title, bpm, key);
         resolve(track);
       },
       onError: (error) => {
@@ -493,25 +555,11 @@ clear.addEventListener("click", function() {
 });
 
 // Load demo library button functionality
-var demo_lib = {"tracks":
-                   {"Colyn - Gravity":{"id":"Colyn - Gravity","artist":"Colyn","title":"Gravity","mixable_tracks":{}},
-                    "Dezza - The Koko Effect (Extended Mix)":{"id":"Dezza - The Koko Effect (Extended Mix)","artist":"Dezza","title":"The Koko Effect (Extended Mix)","mixable_tracks":{}},
-                    "Eli & Fur - Night Blooming Jasmine":{"id":"Eli & Fur - Night Blooming Jasmine","artist":"Eli & Fur","title":"Night Blooming Jasmine","mixable_tracks":{}},
-                    "Jerro - Demons feat. Sophia Bel (Massane Remix)":{"id":"Jerro - Demons feat. Sophia Bel (Massane Remix)","artist":"Jerro","title":"Demons feat. Sophia Bel (Massane Remix)","mixable_tracks":{}},
-                    "Kidnap - Ursa Minor (ATTLAS Remix)":{"id":"Kidnap - Ursa Minor (ATTLAS Remix)","artist":"Kidnap","title":"Ursa Minor (ATTLAS Remix)","mixable_tracks":{}},
-                    "Le Youth - Waves (Extended Mix)":{"id":"Le Youth - Waves (Extended Mix)","artist":"Le Youth","title":"Waves (Extended Mix)","mixable_tracks":{}},
-                    "Luttrell - After All":{"id":"Luttrell - After All","artist":"Luttrell","title":"After All","mixable_tracks":{}},
-                    "ODESZA - La Ciudad":{"id":"ODESZA - La Ciudad","artist":"ODESZA","title":"La Ciudad","mixable_tracks":{}},
-                    "Rinzen - Exoplanet (Original Mix)":{"id":"Rinzen - Exoplanet (Original Mix)","artist":"Rinzen","title":"Exoplanet (Original Mix)","mixable_tracks":{}},
-                    "SG Lewis - Time":{"id":"SG Lewis - Time","artist":"SG Lewis","title":"Time","mixable_tracks":{}},
-                    "Tim Engelhardt - Prophecy":{"id":"Tim Engelhardt - Prophecy","artist":"Tim Engelhardt","title":"Prophecy","mixable_tracks":{}},
-                    "Yotto - Chemicals (Original Mix)":{"id":"Yotto - Chemicals (Original Mix)","artist":"Yotto","title":"Chemicals (Original Mix)","mixable_tracks":{}},
-                    "ZHU - Desert Woman":{"id":"ZHU - Desert Woman","artist":"ZHU","title":"Desert Woman","mixable_tracks":{}}
-                   },
-                "count":0
-               };
+var demo_lib = {"tracks":{"deadmau5 - Monophobia (Rinzen Remix)":{"artist":"deadmau5","title":"Monophobia (Rinzen Remix)","id":"deadmau5 - Monophobia (Rinzen Remix)","bpm":"124","key":"Gbmin","mixable_tracks":{}},"Dezza - Honey (Original Mix)":{"artist":"Dezza","title":"Honey (Original Mix)","id":"Dezza - Honey (Original Mix)","bpm":"126","key":"D#maj","mixable_tracks":{}},"Stanton Warriors, Sian Evans - Up2U (Extended Mix)":{"artist":"Stanton Warriors, Sian Evans","title":"Up2U (Extended Mix)","id":"Stanton Warriors, Sian Evans - Up2U (Extended Mix)","bpm":"128","key":"Gmin","mixable_tracks":{}},"G Jones - Immortal Light (Original Mix)":{"artist":"G Jones","title":"Immortal Light (Original Mix)","id":"G Jones - Immortal Light (Original Mix)","bpm":"150","key":"Fmin","mixable_tracks":{}},"Ben Bohmer - Maelstrom (Original Mix)":{"artist":"Ben Bohmer","title":"Maelstrom (Original Mix)","id":"Ben Bohmer - Maelstrom (Original Mix)","bpm":"123","key":"Fmaj","mixable_tracks":{}},"Cubicolor - Points Beyond (Extended Mix)":{"artist":"Cubicolor","title":"Points Beyond (Extended Mix)","id":"Cubicolor - Points Beyond (Extended Mix)","bpm":"116","key":"Amin","mixable_tracks":{}},"Le Youth - Waves (Extended Mix)":{"artist":"Le Youth","title":"Waves (Extended Mix)","id":"Le Youth - Waves (Extended Mix)","bpm":"124","key":"A#maj","mixable_tracks":{}},"Gorgon City, Drama - You've Done Enough (Extended Mix)":{"artist":"Gorgon City, Drama","title":"You've Done Enough (Extended Mix)","id":"Gorgon City, Drama - You've Done Enough (Extended Mix)","bpm":"125","key":"Cmin","mixable_tracks":{}},"Panama, Jerro - Together (Il:lo Remix)":{"artist":"Panama, Jerro","title":"Together (Il:lo Remix)","id":"Panama, Jerro - Together (Il:lo Remix)","bpm":"114","key":"Amin","mixable_tracks":{}}},"count":0};
+
 
 var load_demo_library = function () {
+  
   localStorage.clear();
   track_stack = []
   track_pointer = -1;
