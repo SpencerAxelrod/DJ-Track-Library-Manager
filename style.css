@@ -24,7 +24,7 @@ body
 
 .current_track {
     padding: 0px 0px 0px 0px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     display: flex;
     //justify-content: center;
     align-items: center;
@@ -39,23 +39,36 @@ body
 .current_artist {
     font-size: 1.15rem;
     padding: 0px 0px 0px 0px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.current_artist.no_track_selected {
+    color: lightgrey;
 }
 
 .current_bpm_key_container {
     display: flex;
     padding: 0px 0px 0px 0px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .current_bpm {
     font-size: 1rem;
     padding: 0px 0px 0px 0px;
+    min-width: 75px;
+}
+
+.current_bpm.no_track_selected {
+    color: lightgrey;
 }
 
 .current_key {
     font-size: 1rem;
     padding: 0px 0px 0px 20px;
+}
+
+.current_key.no_track_selected {
+    color: lightgrey;
 }
 
 .current_prev_next_container {
@@ -69,13 +82,18 @@ body
     margin-right: 10px;
     width: 0;
     height: 0;
-    border-top: 7px solid transparent;
-    border-right: 14px solid #70c3ff;
-    border-bottom: 7px solid transparent;
+    border-top: 9px solid transparent;
+    border-right: 18px solid #70c3ff;
+    border-bottom: 9px solid transparent;
+}
+
+.previous_in_stack:active {
+    border-right: 18px solid #9cd5fd;
 }
 
 .previous_in_stack.no_previous {
-    border-right: 14px solid lightgray;
+    border-right: 18px solid #eeeeee;
+    cursor: default;
 }
 
 .next_in_stack {
@@ -83,13 +101,19 @@ body
     margin-left: 10px;
     width: 0;
     height: 0;
-    border-top: 7px solid transparent;
-    border-left: 14px solid #70c3ff;
-    border-bottom: 7px solid transparent;
+    border-top: 9px solid transparent;
+    border-left: 18px solid #70c3ff;
+    border-bottom: 9px solid transparent;
 }
 
+.next_in_stack:active {
+    border-left: 18px solid #9cd5fd;
+}
+
+
 .next_in_stack.no_next {
-    border-left: 14px solid lightgray;
+    border-left: 18px solid #eeeeee;
+    cursor: default;
 }
 
 .next_tracks_container {

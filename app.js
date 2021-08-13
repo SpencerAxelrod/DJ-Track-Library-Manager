@@ -115,12 +115,15 @@ var update_current_track = function (Track) {
     var item = document.createTextNode(Track.title);
     current_track_div.appendChild(item)
 
+    current_artist_div.classList.remove('no_track_selected')
     var artist_text = document.createTextNode(Track.artist);
     current_artist_div.appendChild(artist_text);
 
+    current_bpm_div.classList.remove('no_track_selected')
     var bpm_text = document.createTextNode("BPM: " + Track.bpm);
     current_bpm_div.appendChild(bpm_text);
 
+    current_key_div.classList.remove('no_track_selected')
     var key_text = document.createTextNode("Key: " + Track.key);
     current_key_div.appendChild(key_text);
 
@@ -143,6 +146,33 @@ var update_current_track = function (Track) {
     current_track_div.appendChild(document.createTextNode("Select a Track from Library"))
     current_track_div.classList.add('no_track_selected')
     current_track = null;
+
+    var artist_text = document.createTextNode('Artists');
+    current_artist_div.classList.add('no_track_selected')
+    current_artist_div.appendChild(artist_text);
+
+    var bpm_text = document.createTextNode("BPM: ");
+    current_bpm_div.classList.add('no_track_selected')
+    current_bpm_div.appendChild(bpm_text);
+
+    var key_text = document.createTextNode("Key: ");
+    current_key_div.classList.add('no_track_selected')
+    current_key_div.appendChild(key_text);
+
+    var left = document.createElement('div');
+    left.classList.add('previous_in_stack');
+    if (track_pointer <= 0) {
+      left.classList.add('no_previous');
+    }
+
+    var right = document.createElement('div');
+    right.classList.add('next_in_stack');
+    if (track_pointer == track_stack.length - 1) {
+      right.classList.add('no_next');
+    }
+
+    current_prev_next_container_div.appendChild(left);
+    current_prev_next_container_div.appendChild(right);
 
   }
 
