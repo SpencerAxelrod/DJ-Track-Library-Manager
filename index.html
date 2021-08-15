@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>DJ Track Library Manager</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <!-- <div class="TrackLibrary" id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+        <p>Drag Tracks into this Drop Zone ...</p>
+        <ul id="lib_list">Track Library
+            
+        </ul>
+    </div>
+-->
+
+
+    
+
+    <div class="container">
+        <div class="current_track_container">
+            <div class="current_track no_track_selected">
+                
+                Select a Track from Library
+                
+            </div>
+            <div class="current_artist no_track_selected">
+
+                Artists
+
+            </div>
+            <div class="current_bpm_key_container">
+                <div class="current_bpm no_track_selected">
+
+                    BPM:
+
+                </div>
+                <div class="current_key no_track_selected">
+
+                    Key:
+
+                </div>
+            </div>
+            <div class="current_prev_next_container">
+                <div class="previous_in_stack no_previous"></div>
+                <div class="next_in_stack no_next"></div>
+            </div>
+            <div class="next_tracks_container next_tracks_container_empty">
+                <div class="next_tracks next_tracks_empty"></div>
+                <div class="next_track_info next_track_info_empty"></div>
+            </div>
+        </div> 
+        <div class="box__input">
+            <input class="box__file" type="file" name="files[]" id="file" data-multiple-caption="{count} files selected" multiple />
+            <label for="file">
+                <strong>Choose MP3s to upload</strong>
+                <span class="box__dragndrop"> or drag them into the Track Library</span>.
+            </label>
+        </div>
+        <div class="track_library_title_container">Track Library
+            <button id="clear">Clear Library</button>
+        </div>
+        <form class="box" method="post" action="" enctype="multipart/form-data">
+            
+            
+            <ul id="lib_list"></ul>
+            
+        </form>
+        <div class="library_footer">
+            <div class="load_demo_library">Load a <a class="demo_button">demo library</a></div>
+        </div>
+
+        
+    </div>
+    
+
+    <script src="./jsmediatags.min.js"></script>
+    <script src="app.js" async defer></script>
+</body>
+</html>
