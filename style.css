@@ -8,9 +8,8 @@ body
 
 .container
 {
-    width: 100%;
-    min-width: 800px;
-    max-width: 800px; /* 800 */
+    min-width: 650px;
+    max-width: 1200px; /* 800 */
     /*text-align: center;*/
     margin: 0 auto;
     /*outline: 1px dashed red;*/
@@ -286,6 +285,7 @@ body
     outline: 1px dotted #000;
 }
 
+/*
 .box ul {
     max-height: 400px;
     outline: 1px solid lightgrey;
@@ -323,31 +323,93 @@ body
 .box li:nth-child(2n):hover{
     background: #ececec;
 }
+*/
 
-.add_mixible_button {
+.lib_table {
+    font-size: 1rem;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.lib_table.lib_empty {
+    color: lightgrey;
+}
+
+.lib_table.lib_empty thead tr th{
+    font-weight: normal;
+    padding-bottom: 20px;
+}
+
+.lib_table tbody {
+    outline: 1px solid #cccccc
+}
+
+.lib_table.lib_empty tbody {
+    outline: 1px solid transparent;
+    font-size: 1.25rem;
+}
+
+.lib_table th, td {
+    padding: 0.5rem;
+    text-align: left;
+}
+
+.lib_table td {
+    border: 1px solid #eeeeee;
+}
+
+.lib_table tbody tr:first-child td {
+    border-top: 0;
+}
+
+.lib_table tbody tr td:first-child {
+    border-left: 0;
+}
+
+.lib_table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.lib_table tbody tr td:last-child {
+    border-right: 0;
+    padding: 0;
+    text-align: center;
+    width: 60px;
+}
+
+.lib_table tbody tr:nth-child(even) {
+    background: #f7f7f7;
+}
+
+.lib_table tbody:hover {
+    cursor: pointer;
+}
+
+.lib_table.lib_empty tbody:hover{
+    cursor: default;
+}
+
+.lib_table tbody tr:hover {
+    background: #ececec;
+}
+
+.add_mixable_button {
     background-color:#87cdff;
-	border-radius: 0px;
-	display: inline-block;
 	cursor: pointer;
 	color: #ffffff;
 	font-family: Arial;
 	font-size: 14px;
-	padding: 10px 20px 10px 20px;
     text-decoration: none;
 }
-.add_mixible_button:hover {
+.add_mixable_button:hover {
 	background-color: #44c767;
 }
-.add_mixible_button:active {
-	position:relative;
-	top:0px;
-}
 
-.box li:nth-child(2n) .add_mixible_button{
+.lib_table tbody tr:nth-child(2n) .add_mixable_button{
     background-color:#70c3ff;
 }
 
-.box li:nth-child(2n) .add_mixible_button:hover{
+.lib_table tbody tr:nth-child(2n) .add_mixable_button:hover{
     background-color: #44c767;
 }
 
