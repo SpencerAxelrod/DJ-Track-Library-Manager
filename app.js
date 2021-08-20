@@ -224,6 +224,41 @@ var update_current_track = function (Track) {
 
 // function that updates next tracks div with next/mixable tracks
 var update_next_tracks = function (next_tracks) {
+  var next_tracks_table = document.querySelector('.next_tracks_table');
+  var next_tracks_table_tbody = document.querySelector('.next_tracks_table_tbody');
+  while (next_tracks_table_tbody.hasChildNodes()) {
+    next_tracks_table_tbody.removeChild(next_tracks_table_tbody.childNodes[0]);
+  }
+  if (next_tracks.length > 0) {
+    for (var i = 0; i < next_tracks.length; i++) {
+      var tr = document.createElement('tr');
+      tr.id = next_tracks[i].id;
+
+      var td_title = document.createElement('td');
+      var title_div = document.createElement('div');
+      title_div.appendChild(document.createTextNode(next_tracks[i].title));
+      title_div.title = next_tracks[i].title;
+      td_title.appendChild(title_div);
+      var td_artists = document.createElement('td');
+      var artist_div = document.createElement('div');
+      artist_div.appendChild(document.createTextNode(next_tracks[i].artist));
+      artist_div.title = next_tracks[i].artist;
+      td_artists.appendChild(artist_div);
+      var td_bpm = document.createElement('td');
+      td_bpm.appendChild(document.createTextNode(next_tracks[i].bpm));
+      var td_key = document.createElement('td');
+      td_key.appendChild(document.createTextNode(next_tracks[i].key));
+
+      tr.appendChild(td_title);
+      tr.appendChild(td_artists);
+      tr.appendChild(td_bpm);
+      tr.appendChild(td_key);
+
+      next_tracks_table_tbody.appendChild(tr);
+    }
+  }
+
+  /*
   var next_track_div = document.querySelector('.next_tracks');
   while (next_track_div.hasChildNodes()) {
     next_track_div.removeChild(next_track_div.childNodes[0]);
@@ -259,6 +294,7 @@ var update_next_tracks = function (next_tracks) {
   } else {
     next_track_div.classList.add('next_tracks_empty')
   }
+  */
 };
 
 // Initial Current Track render from local storage
@@ -267,8 +303,14 @@ if (track_pointer >= 0) {
   console.log(track_pointer);
   console.log(track_stack[track_pointer]);
   current_track = track_library.tracks[track_stack[track_pointer]];
+  console.log(current_track);
   update_current_track(current_track);
-  update_next_tracks(current_track);
+  var next_tracks_ids = current_track.mixable_tracks;
+  var next_tracks = [];
+  for (var i = 0; i < Object.keys(next_tracks_ids).length; i++) {
+    next_tracks.push(track_library.tracks[Object.keys(next_tracks_ids)[i]])
+  }
+  update_next_tracks(next_tracks);
 }
 
 // function to process id after a library track is clicked
@@ -309,8 +351,8 @@ var clickedAddMixable = function(track_id) {
     for (var i = 0; i < Object.keys(next_tracks_ids).length; i++) {
       next_tracks.push(track_library.tracks[Object.keys(next_tracks_ids)[i]])
     }
-    set_local_storage_lib();
     update_next_tracks(next_tracks);
+    set_local_storage_lib();
   }
 };
 
@@ -377,12 +419,22 @@ var clickedNextTrack =  function (track_id) {
 };
 
 // Next/mixable tracks click listener functionality
+document.querySelector(".next_tracks_table").addEventListener("click", function(e) {
+  if (e.target && e.target.nodeName == "DIV") {
+    clickedNextTrack(e.target.parentNode.parentNode.id);
+  } else if (e.target && e.target.nodeName == "TD") {
+    clickedNextTrack(e.target.parentNode.id);
+  }
+});
+
+/*
 document.querySelector(".next_tracks").addEventListener("click", function(e) {
   //e.target is our targetted element.
   if(e.target && e.target.classList.contains("next_track_li_div")) {
     clickedNextTrack(e.target.parentNode.id);
   }
 });
+*/
 
 // function to process id after a track from next track info is clicked
 var clickedNextTrackToCurrent = function (track_id) {
@@ -564,6 +616,7 @@ var awaitableHelper = function(mp3_file) {
       },
       onError: (error) => {
         alert('read error');
+        console.log(error);
         reject(error);
       }
     });

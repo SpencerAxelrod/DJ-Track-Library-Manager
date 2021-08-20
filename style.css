@@ -1,6 +1,6 @@
 body
 {
-    font-family: Roboto, sans-serif;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #0f3c4b;
     background-color: #e5edf1;
     padding: 4rem 1.25rem; /* 80 20 */
@@ -25,9 +25,9 @@ body
     padding: 0px 0px 0px 0px;
     margin-bottom: 5px;
     display: flex;
-    //justify-content: center;
     align-items: center;
     font-weight: bold;
+    font-family: monospace;
 }
 
 .current_track.no_track_selected {
@@ -181,13 +181,78 @@ body
 
 }
 
+.next_tracks_table_container {
+    flex-basis: 0;
+    flex-grow: 1.5;
+    outline: 1px solid lightgrey;
+    padding: 0px 0px 0px 0px;
+    height: 172px;
+    overflow: auto;
+}
+
+.next_tracks_table {
+    padding: 0px 0px 0px 0px;
+    font-size: 1rem;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.next_tracks_table td {
+    padding: 0.5rem;
+    text-align: left;
+    border: 1px solid #eeeeee;
+}
+
+.next_tracks_table tbody tr:first-child td {
+    border-top: 0;
+}
+
+.next_tracks_table tbody tr td:first-child {
+    border-left: 0;
+}
+
+.next_tracks_table tbody tr td:last-child {
+    border-right: 0;
+}
+
+.next_tracks_table tbody tr:nth-child(even) {
+    background: #f7f7f7;
+}
+
+.next_tracks_table tbody:hover {
+    cursor: pointer;
+}
+
+.next_tracks_table tbody tr:hover {
+    background: #ececec;
+}
+
+.next_tracks_table td div {
+    max-height: 1.3em;
+    overflow: hidden;
+    position: relative;
+    color: transparent;
+}
+
+.next_tracks_table td div:after {
+    content: attr(title);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    color: black;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
 .next_track_info {
     flex-basis: 0;
     flex-grow: 1;
     border: 1px solid lightgrey;
     margin-left: 30px;
     padding: 0px 0px 0px 0px;
-    height: 172px;
+    //height: 172px;
 }
 
 .next_track_artist_title {
@@ -352,6 +417,10 @@ body
 .lib_table th, td {
     padding: 0.5rem;
     text-align: left;
+}
+
+.lib_table th {
+    font-weight: normal;
 }
 
 .lib_table td {
